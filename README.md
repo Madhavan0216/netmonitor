@@ -19,6 +19,22 @@ NetMonitor is a **defensive cybersecurity platform** for:
 
 **This is NOT a hacking tool.** It's designed for legitimate defensive monitoring only.
 
+## Screenshots
+
+| Dashboard | Packet Explorer |
+| --- | --- |
+| ![NetMonitor dashboard](screenshots/dashboard.png) | ![Packet explorer](screenshots/packet-explorer.png) |
+
+| Network Scanner | Alert Center |
+| --- | --- |
+| ![Network scanner](screenshots/network-scanner.png) | ![Alert center](screenshots/alert-center.png) |
+
+| Network Map | Settings |
+| --- | --- |
+| ![Network map](screenshots/network-map.png) | ![Settings profile](screenshots/settings-profile.png) |
+
+Additional screenshots covering startup, login, legal consent, and settings are available in the [screenshots](screenshots/) directory.
+
 ## ⚖️ Legal & Ethical Disclaimer
 
 > ⚠️ **IMPORTANT:** Only use this tool on networks you own or have explicit written permission to monitor/scan.
