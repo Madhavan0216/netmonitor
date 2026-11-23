@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.Python
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Databases and runtime data
+*.db
+*.sqlite
+*.sqlite3
+*.log
+error.txt
+scripts/logs/
+scripts/.running
+packet-captures/
+captures/
+
+# Node and frontend
+frontend/node_modules/
+frontend/dist/
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Build tools
+.vite/
+.cache/
+*.tsbuildinfo
+
+# IDE and OS
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# Windows
+*.lnk

@@ -1,0 +1,739 @@
+# 📋 NetMonitor - Comprehensive Project Analysis Report
+
+## 🎯 Project Overview
+
+| Field | Details |
+|---|---|
+| Project Name | NetMonitor |
+| Type | Full-stack defensive network monitoring and security analytics platform |
+| Concept | Browser-based network command center for packet inspection, safe scanning, topology visualization, and explainable threat detection |
+| Purpose | Monitor traffic, discover hosts, detect suspicious activity, visualize topology, and present security findings in a beginner-friendly and SOC-grade UI |
+| Architecture | Event-driven full-stack system with FastAPI backend, React/Vite frontend, async services, WebSocket fanout, and SQLite persistence |
+| Languages | Python, TypeScript, HTML, CSS, JSON, shell/batch scripts |
+| Runtime | Python 3.9+ backend runtime; Node.js 18+ frontend tooling/runtime; FastAPI/Uvicorn service layer |
+| Current Status | Actively developed, feature-rich, operationally oriented defensive monitoring platform with development defaults, local SQLite storage, and several production-hardening features already in place |
+
+### Executive Snapshot
+
+NetMonitor is not a generic dashboard. It is a deliberately safety-constrained defensive network intelligence platform with three dominant concerns:
+
+1. Real-time observability of packet flow, host discovery, alerts, and topology state.
+2. Conservative guardrails around scanning, capture, and alert generation.
+3. A dual-mode user experience that supports both beginners and experienced operators.
+
+The backend behaves like a telemetry and orchestration core. The frontend behaves like a SOC cockpit. The result is a system that emphasizes explainability, continuity, and defensive controls over raw feature density.
+
+---
+
+## 📁 Complete File Structure
+
+```bash
+netmonitor/
+├── README.md                          # Primary project introduction, setup, legal notice, and architecture summary
+├── SETUP_GUIDE.md                     # Setup and operational onboarding guidance
+├── report.txt                         # Existing project report artifact
+├── error.txt                          # Captured runtime or troubleshooting output
+├── suggestions.txt                    # Improvement notes and recommendations
+├── updation.txt                       # Update/change log artifact
+├── start.bat                          # Windows launcher for project startup
+├── stop.bat                           # Windows launcher for project shutdown
+├── scripts/
+│   ├── start_project.ps1              # PowerShell bootstrap for local startup
+│   ├── run.bat                        # Windows script wrapper for run workflow
+│   └── error_logger.py                # Script for error capture and logging
+├── docs/
+│   ├── API.md                         # REST and WebSocket API reference
+│   ├── ARCHITECTURE.md                # High-level component architecture
+│   ├── ARCHITECTURE_DIAGRAMS.md       # ASCII diagrams for backend/runtime flows
+│   ├── BACKEND_HARDENING.md           # Security hardening guidance for backend services
+│   ├── DESIGN_SPECIFICATION.md        # Core design doctrine and implementation targets
+│   ├── DETECTION_RULES.md             # Threat detection rule catalog and tuning guide
+│   └── DETECTION_SYSTEM.md            # Detection pipeline and alerting system design
+├── backend/
+│   ├── requirements.txt                # Python dependency contract for the backend runtime
+│   ├── netmonitor.db                   # Local SQLite database artifact used by the app
+│   ├── app/
+│   │   ├── __init__.py                 # Python package marker
+│   │   ├── main.py                    # FastAPI app entry point and service lifecycle orchestration
+│   │   ├── api/
+│   │   │   ├── __init__.py             # API package marker
+│   │   │   ├── auth.py                 # JWT auth, login, user info, password change, user management
+│   │   │   ├── alerts.py              # Alert retrieval, stats, summaries, acknowledge/delete/clear routes
+│   │   │   ├── dashboard.py           # Aggregated dashboard summary and security score routes
+│   │   │   ├── export.py              # Export endpoints for packets, alerts, topology, and SIEM formats
+│   │   │   ├── health.py              # Health/readiness/metrics probes
+│   │   │   ├── network.py             # Host discovery, ARP cache, connections, and network topology data
+│   │   │   ├── packets.py             # Capture control, interface listing, packet retrieval, packet stats
+│   │   │   ├── scanner.py             # Safe network scan controls and scan lifecycle routes
+│   │   │   └── topology.py            # Topology snapshot, node, edge, and classification routes
+│   │   ├── core/
+│   │   │   ├── __init__.py             # Core package marker
+│   │   │   ├── audit.py               # Audit logging and security event tracking
+│   │   │   ├── config.py              # Application settings, safety limits, and environment-driven config
+│   │   │   ├── events.py              # Event model and internal event propagation helpers
+│   │   │   ├── privileged_agent.py    # Privileged operations boundary and elevated system interaction
+│   │   │   ├── schemas.py             # Pydantic schemas and validated request/response models
+│   │   │   ├── alerting/
+│   │   │   │   ├── __init__.py         # Alerting package marker
+│   │   │   │   └── alert_manager.py    # Alert persistence, callbacks, acknowledgement, and throttling
+│   │   │   ├── capture/
+│   │   │   │   ├── __init__.py         # Capture package marker
+│   │   │   │   ├── interface_utils.py  # Interface discovery and normalization helpers
+│   │   │   │   └── packet_capture.py   # Scapy capture engine, packet parsing, buffering, callbacks
+│   │   │   ├── detection/
+│   │   │   │   ├── __init__.py         # Detection package marker
+│   │   │   │   ├── correlation.py      # Cross-signal correlation for multi-stage detections
+│   │   │   │   ├── engine.py           # Rule-based detection engine and alert generation
+│   │   │   │   ├── evidence.py         # Evidence models and explainability helpers
+│   │   │   │   └── rules.py            # Advanced detection rules and specialized detectors
+│   │   │   ├── export/
+│   │   │   │   └── __init__.py         # Export package marker and exporter wiring
+│   │   │   ├── interfaces/
+│   │   │   │   ├── __init__.py         # Interfaces package marker
+│   │   │   │   ├── arp_monitor.py      # ARP cache monitoring and spoofing indicators
+│   │   │   │   ├── gateway.py          # Default gateway detection and gateway metadata
+│   │   │   │   └── interface_monitor.py # Interface state monitoring and change notifications
+│   │   │   ├── scanner/
+│   │   │   │   ├── __init__.py         # Scanner package marker
+│   │   │   │   └── network_scanner.py  # Safe nmap-backed scan engine with target validation
+│   │   │   ├── storage/
+│   │   │   │   ├── __init__.py         # Storage package marker
+│   │   │   │   └── db_retention.py     # Database retention and cleanup scheduling
+│   │   │   ├── telemetry/
+│   │   │   │   ├── __init__.py         # Telemetry package marker
+│   │   │   │   ├── bounded_queue.py    # Bounded queue implementation for controlled buffering
+│   │   │   │   └── metrics.py         # Metrics collector, counters, gauges, histograms, rates
+│   │   │   └── topology/
+│   │   │       ├── __init__.py         # Topology package marker
+│   │   │       ├── device_classifier.py # Device type/role classification logic
+│   │   │       ├── topology_service.py # Topology state management and change emission
+│   │   │       └── traffic_aggregator.py # Flow aggregation and edge metric computation
+│   │   ├── database/
+│   │   │   ├── __init__.py             # Database package marker
+│   │   │   ├── init_db.py              # Database bootstrap and initialization
+│   │   │   ├── models.py               # SQLAlchemy ORM models for users, alerts, scans, hosts
+│   │   │   └── session.py              # Async session/engine setup
+│   │   └── websocket/
+│   │       ├── __init__.py             # WebSocket package marker
+│   │       └── manager.py              # Channel-based WebSocket connection manager and broadcaster
+│   └── venv/                           # Checked-in virtual environment artifact; not part of source architecture
+├── frontend/
+│   ├── index.html                      # SPA shell and Vite entry document
+│   ├── package.json                    # Frontend dependency and script manifest
+│   ├── package-lock.json               # Locked dependency graph
+│   ├── postcss.config.js               # PostCSS pipeline configuration
+│   ├── tailwind.config.js              # Tailwind theme and utility configuration
+│   ├── tsconfig.json                   # TypeScript project configuration
+│   ├── tsconfig.node.json              # TypeScript config for Vite/node tooling
+│   ├── vite.config.ts                  # Vite build and dev-server config
+│   └── src/
+│       ├── main.tsx                    # React root bootstrap and router mounting
+│       ├── App.tsx                     # Route definitions and protected navigation shell
+│       ├── index.css                   # Global styles, theme scaffolding, and UI primitives
+│       ├── design-system.ts            # Semantic color, typography, spacing, and utility tokens
+│       ├── components/
+│       │   ├── AlertsFeed.tsx          # Compact alert feed widget for dashboard/sidebar contexts
+│       │   ├── ErrorBoundary.tsx       # React error boundary and recovery UX
+│       │   ├── Layout.tsx              # SOC-style application shell with nav, mode switch, shortcuts
+│       │   ├── LegalConsentBanner.tsx  # First-run legal acknowledgment gate
+│       │   ├── SecurityScoreCard.tsx   # Status ring and security posture summary widget
+│       │   ├── TrafficChart.tsx        # Chart.js protocol distribution visualization
+│       │   └── ui/
+│       │       └── index.tsx           # Reusable UI primitives and beginner-mode helpers
+│       ├── hooks/
+│       │   └── useWebSocket.ts         # WebSocket hook for live packets, alerts, stats, topology
+│       ├── pages/
+│       │   ├── Alerts.tsx              # Alert center with evidence-first triage workflow
+│       │   ├── Dashboard.tsx           # Overview dashboard and health summary surface
+│       │   ├── Login.tsx               # Authentication screen
+│       │   ├── NetworkMap.tsx          # Animated topology visualization and force layout
+│       │   ├── NetworkScanner.tsx      # Safe scan UI with target validation and confirmations
+│       │   ├── PacketCapture.tsx       # Packet explorer and live capture interface
+│       │   └── Settings.tsx            # Profile/security/preferences and detection rule controls
+│       ├── services/
+│       │   └── api.ts                  # Axios API client and endpoint wrappers
+│       └── stores/
+│           ├── authStore.ts            # Persistent auth/token state via Zustand
+│           └── uiStore.ts              # Persistent UI preference and mode state via Zustand
+└── .vscode/
+    └── settings.json                   # Editor configuration for the workspace
+```
+
+### Structural Notes
+
+- The backend is organized as a service-oriented FastAPI application with cohesive domain modules rather than a monolith of route handlers.
+- The frontend is organized around a route shell plus page-level workflows and reusable status widgets.
+- The repository contains a checked-in virtual environment under backend/venv. It should be treated as an operational artifact, not as product source.
+- The database file backend/netmonitor.db indicates local persistence is part of the development loop and likely used as the default runtime store.
+
+---
+
+## 🔧 Technology Stack
+
+### Backend
+
+| Layer | Technologies | Observations |
+|---|---|---|
+| Language | Python | Primary orchestration and service implementation language |
+| Web Framework | FastAPI | Async HTTP API, dependency injection, lifespan hooks, OpenAPI docs in debug mode |
+| ASGI Server | Uvicorn | Production and development runtime |
+| Data Validation | Pydantic v2, pydantic-settings | Strong request/response typing and environment-driven config |
+| ORM/Data Access | SQLAlchemy 2.x, aiosqlite, Alembic | Async persistence layer with migration capability |
+| Packet Capture | Scapy, tshark-compatible workflows | Metadata-first packet inspection and protocol parsing |
+| Network Scanning | python-nmap, Nmap | Safe host discovery and limited port/service probing |
+| Security/Auth | python-jose, bcrypt, passlib | JWT authentication and password hashing |
+| Async/Realtime | asyncio, WebSockets | Streaming packet, alert, topology, and stats events |
+| Observability | structlog, internal metrics collector, psutil | Structured logs and runtime telemetry |
+| Queueing/Control | Bounded queues, retention tasks | Prevents unbounded memory growth |
+
+### Frontend
+
+| Layer | Technologies | Observations |
+|---|---|---|
+| Language | TypeScript | Strongly typed UI and data-flow contracts |
+| UI Framework | React 18 | Component-driven SPA architecture |
+| Build Tool | Vite | Fast dev server and optimized production bundles |
+| Routing | react-router-dom | Protected route shell with nested navigation |
+| State Management | Zustand | Persistent auth and UI preferences |
+| Styling | Tailwind CSS, custom design tokens | Dark SOC-style visual system with semantic utility classes |
+| Visualization | Chart.js, react-chartjs-2 | Protocol distribution and dashboard charts |
+| Icons | lucide-react | Consistent iconography across the shell and pages |
+| Date/Formatting | date-fns | Human-readable alert timing and metadata |
+| Utility | clsx, tailwind-merge | Conditional class composition |
+| API Client | axios | Centralized REST client with auth interceptors |
+
+### Infrastructure / Operational Surface
+
+| Area | Technologies | Notes |
+|---|---|---|
+| Local Database | SQLite | Default `netmonitor.db` for development and local persistence |
+| Config | `.env`, `pydantic-settings` | Environment-driven backend configuration |
+| Launcher Scripts | `.bat`, PowerShell | Windows-friendly startup and shutdown wrappers |
+| Documentation | Markdown + ASCII diagrams | Architecture and behavior are extensively documented |
+| Browser Runtime | WebSocket + REST | Live data transport and conventional request/response APIs |
+
+### External Services and System Dependencies
+
+| Dependency | Role | Risk / Dependency Note |
+|---|---|---|
+| Nmap | Host discovery and scanning backend | Must be installed on the host system for full scanning capability |
+| Npcap / libpcap equivalents | Packet capture enablement | Required for capture on supported platforms |
+| Admin / root privileges | Packet capture and some scans | Capture and SYN-style scan behavior may require elevation |
+| Local DNS / reverse lookup | Hostname enrichment | Used for label enrichment in network views |
+
+---
+
+## 🖥️ Core Components
+
+| File / Module | Purpose | Responsibilities | Workflow | Interactions |
+|---|---|---|---|---|
+| backend/app/main.py | Application bootstrap and runtime orchestration | Creates FastAPI app, initializes services, wires callbacks, starts/stops background jobs | Lifespan startup creates DB tables, instantiates services, registers broadcast hooks, starts monitors, resolves gateway, then stores instances in app state | Talks to packet capture, detection, alerts, topology, telemetry, WebSocket manager, retention services, and all API routers |
+| backend/app/core/capture/packet_capture.py | Packet capture engine | Captures traffic with Scapy, parses metadata, buffers packets, updates metrics, triggers detection and topology updates | Sniffs on a selected interface, transforms packets into structured records, pushes them into a circular buffer, forwards them to detection and topology | Feeds detection engine, topology service, telemetry metrics, and WebSocket callbacks |
+| backend/app/core/scanner/network_scanner.py | Safe scan orchestration | Validates targets, enforces RFC1918/local-only policies, executes constrained scan profiles, tracks results | Validates IP/CIDR/ranges, selects scan profile, runs nmap-backed scan, stores progress and results, notifies callbacks | Used by scanner API, audit logger, and UI scan history flows |
+| backend/app/core/detection/engine.py | Threat detection core | Applies rate-based and heuristic rules, correlates signals, creates explainable detection events | Each packet is analyzed against port scan, flood, ARP spoofing, DNS tunneling, suspicious-port, ICMP sweep, and advanced detectors | Emits events to alert manager and WebSocket layer; uses correlation/rules modules |
+| backend/app/core/detection/rules.py | Advanced detectors | Encapsulates higher-order detectors such as lateral movement, beaconing, broadcast abuse, and device scoring | Observes packet patterns over sliding windows and creates events when thresholds/rules are met | Consumed by detection engine |
+| backend/app/core/detection/correlation.py | Cross-signal correlation | Links multiple low-level detections into more meaningful attack narratives | Aggregates detections and raises correlated alerts when patterns align | Consumed by detection engine |
+| backend/app/core/alerting/alert_manager.py | Alert lifecycle manager | Stores alerts in memory, rate-limits noisy rules, acknowledges, deletes, clears, and summarizes | Detection events are converted to alert objects, then made available to APIs and WebSocket callbacks | Used by alerts API, dashboard API, and WebSocket broadcast path |
+| backend/app/core/topology/topology_service.py | Topology state engine | Maintains nodes, edges, activity state, and change events for visualization | Packet events update nodes/edges, classify devices, calculate activity, and emit topology changes | Feeds network/topology APIs and WebSocket streams |
+| backend/app/core/topology/device_classifier.py | Device classification heuristics | Infers device type and role from observed behavior | Classifies nodes and provides confidence plus explanation | Used by topology service and topology APIs |
+| backend/app/core/topology/traffic_aggregator.py | Flow aggregation | Consolidates packet streams into edge metrics | Builds per-flow packet/byte counts, protocol sets, and directionality | Used by topology service |
+| backend/app/core/interfaces/interface_monitor.py | Interface telemetry | Tracks interface up/down changes | Polls system state and emits structured events | Hooked into main lifecycle for WebSocket notifications |
+| backend/app/core/interfaces/arp_monitor.py | ARP monitoring | Detects ARP cache changes and stale mappings | Polls ARP state and emits warnings/critical events for suspicious changes | Forwarded to alert and WebSocket layers |
+| backend/app/core/interfaces/gateway.py | Gateway detection | Identifies the default gateway | Resolves and stores gateway metadata | Used by topology and network views |
+| backend/app/core/telemetry/metrics.py | Internal observability | Implements counters, gauges, rates, histograms, timers, and collectors | Services record packet, connection, and performance metrics throughout runtime | Exposed through health/metrics endpoints and internal collectors |
+| backend/app/websocket/manager.py | Real-time channel manager | Manages connections, subscriptions, rate-limited broadcasts, and cleanup | Accepts sockets, tracks channel membership, broadcasts packet/alert/topology/stat messages | Central transport for live frontend updates |
+| backend/app/api/auth.py | Authentication boundary | Handles login, JWT issuance, user lookup, password changes, and admin-only user management | Validates credentials, issues bearer token, provides user context dependency | Consumed by all protected routes and frontend auth store |
+| backend/app/api/packets.py | Capture control API | Exposes interfaces, start/stop capture, stats, and packet retrieval | Uses capture service from app state and wraps responses in normalized schema | Drives PacketCapture page and dashboard widgets |
+| backend/app/api/scanner.py | Scan control API | Exposes scan start/status/list/cancel and validation endpoints | Uses global scan service, logs audit events, and returns normalized scan objects | Drives NetworkScanner page |
+| backend/app/api/alerts.py | Alert operations API | Exposes alert listing, stats, summary, acknowledge/delete/clear, rule list | Pulls from alert manager, supports filters, and returns wrapped response data | Drives Alerts page, feed widgets, and settings rule editor |
+| backend/app/api/dashboard.py | Dashboard aggregation API | Aggregates capture, alert, traffic, detection, and health data | Pulls metrics from services and returns a single summary snapshot | Drives Dashboard page and overview widgets |
+| backend/app/api/network.py | Passive network discovery API | Exposes discovered hosts, ARP cache, active connections, topology, and local info | Derives network state from captured packets and ARP knowledge | Drives NetworkMap and network explorer views |
+| backend/app/api/topology.py | Topology snapshot API | Exposes topology snapshot, node detail, filtered nodes/edges, and service stats | Returns classified graph state and associated evidence | Feeds NetworkMap visualization and detailed drilldowns |
+| backend/app/api/health.py | Health/readiness/metrics endpoints | Supports operational probes and diagnostics | Checks database, capture, detection, WebSocket, and system state | Useful for deployment readiness and monitoring |
+| backend/app/api/export.py | Export surface | Exports packets, alerts, topology, and SIEM-friendly payloads | Serializes filtered application data to JSON, CSV, NDJSON, gzip, and CEF-like formats | Supports incident analysis and archival workflows |
+| frontend/src/App.tsx | Route topology | Defines protected shell and page routes | Redirects unauthenticated users to login and nests the main layout under `/` | Connects auth store and page components |
+| frontend/src/components/Layout.tsx | Shell and operator UX | Sidebar, mode toggle, shortcuts, user menu, and legal consent banner | Provides the consistent application chrome and keyboard-driven navigation | Wraps all protected pages |
+| frontend/src/pages/Dashboard.tsx | Overview cockpit | Shows security score, capture status, threat summary, charts, and live alerts | Fetches summary endpoints on an interval and renders status cards | Uses dashboard API, chart widget, alert feed, and score card |
+| frontend/src/pages/PacketCapture.tsx | Packet explorer | Manages interface selection, capture controls, filters, packet table, and live stream fallback | Uses WebSocket when active, falls back to polling, supports filter presets, and keeps auto-scroll optional | Talks to packets API, UI store, and WebSocket hook |
+| frontend/src/pages/NetworkScanner.tsx | Safe scanning UI | Provides target validation, scan type selection, aggressive-scan confirmations, and scan history | Validates target inputs before start, polls scan results, and shows detailed progress | Talks to scanner API and UI store |
+| frontend/src/pages/Alerts.tsx | Alert center | Triage workflow with evidence-first presentation, summaries, filter/search, acknowledgement actions | Merges live WebSocket alerts with polled backend data and supports quick actions | Talks to alerts API, WebSocket hook, and UI store |
+| frontend/src/pages/NetworkMap.tsx | Topology visualization | Force-directed graph, canvas rendering, zoom/pan, live flow updates | Pulls topology data, animates nodes/edges, and reacts to live changes | Talks to network API, topology WebSocket stream, and UI store |
+| frontend/src/pages/Settings.tsx | Account and rule management | Profile display, password change, and detection rule toggles | Switches between profile/security/detection tabs and calls corresponding APIs | Uses auth API and alerts API |
+| frontend/src/components/SecurityScoreCard.tsx | Security posture widget | Renders a circular score indicator with color-coded status and factor counts | Converts score data into a visual ring and semantic status badge | Used on dashboard |
+| frontend/src/components/TrafficChart.tsx | Protocol distribution chart | Renders a doughnut chart with protocol percentages | Converts dashboard traffic data into Chart.js datasets | Used on dashboard |
+| frontend/src/components/AlertsFeed.tsx | Compact alert list | Shows recent alerts and supports acknowledgement | Polls alert data, expands for details, and provides quick ack action | Used on dashboard |
+| frontend/src/components/LegalConsentBanner.tsx | Compliance gate | Enforces explicit legal acknowledgment on first use | Reads/writes consent state to localStorage and blocks progression until accepted | Used in application shell |
+| frontend/src/components/ErrorBoundary.tsx | Runtime safety net | Catches React runtime errors and provides recovery actions | Offers reset and reload paths, and technical diagnostics in dev mode | Guards the entire frontend tree |
+| frontend/src/components/ui/index.tsx | UI primitives | Provides badges, tooltips, explanation panels, stat cards, and empty states | Standardizes repeated SOC-style UI patterns | Used across pages and widgets |
+| frontend/src/stores/authStore.ts | Authentication persistence | Stores token/user/auth state and initializes headers | Persists session in localStorage and restores JWT on reload | Used by API client and protected routes |
+| frontend/src/stores/uiStore.ts | UI preference persistence | Stores beginner/expert mode, sidebar state, and view preferences | Persists UI choices across sessions | Used by layout and all pages |
+| frontend/src/services/api.ts | API transport layer | Central axios client, token injection, 401 handling, and endpoint wrappers | Normalizes backend interaction and redirects on unauthorized responses | Used by every data-fetching page |
+| frontend/src/hooks/useWebSocket.ts | Realtime frontend hook | Connects to WebSocket channels for packets, alerts, stats, topology, and scans | Maintains stable refs to prevent reconnection loops and manages local state arrays | Used by PacketCapture, Alerts, and NetworkMap |
+| backend/app/database/models.py | Persistence model layer | Defines users, alerts, scans, hosts, packet stats, and detection rules | Maps domain data into relational records | Used by APIs, auth, export, and health checks |
+| backend/app/database/session.py | Async DB setup | Engine, session factory, and base model wiring | Provides DB access for the app | Used by auth, health, export, and startup bootstrap |
+| backend/app/database/init_db.py | Schema init | Database seeding and table initialization | Creates or prepares local SQLite structures | Used by setup scripts and onboarding |
+
+---
+
+## 🎨 Frontend / UI Analysis
+
+### UI Structure
+
+The frontend is a single-page application with a protected shell and nested route pages. The layout is intentionally modeled after a security operations center rather than a consumer app. It favors dense information, strong hierarchy, and immediate operational clarity.
+
+| UI Layer | Description |
+|---|---|
+| Application shell | Persistent sidebar, mode switch, user panel, legal acknowledgment, and keyboard shortcut support |
+| Overview dashboard | High-level posture summary with score, counts, protocol distribution, and recent alerts |
+| Packet explorer | Live capture console with protocol-aware filtering and privacy-first packet display |
+| Network scanner | Guided scanning workflow with safety cues, target validation, and aggressive-scan confirmation |
+| Alert center | Evidence-first triage interface with search, filtering, acknowledgement, and detail expansion |
+| Network map | Animated topology canvas with flow emphasis, selection, and live update integration |
+| Settings | Profile, password, and detection rule management in a tabbed admin-style layout |
+
+### UX Flow
+
+1. User lands on the login screen and authenticates.
+2. The auth token is persisted and rehydrated on refresh.
+3. The legal consent banner blocks first-run usage until acknowledged.
+4. The user enters the SOC-style shell and chooses a page.
+5. Live telemetry begins to flow through REST polling and WebSocket channels.
+6. The user can shift from beginner mode to expert mode for shortcuts and denser controls.
+7. Operational tasks branch into capture, scan, alert triage, or topology analysis.
+
+### Visual Identity
+
+| Dimension | Implementation |
+|---|---|
+| Theme | Dark SOC console aesthetic with controlled blue accents and severity colors |
+| Typography | Compact, information-dense sans styling in the main UI plus monospace usage for technical data |
+| Color System | Semantic colors are tied to severity, protocol, and risk states rather than decoration |
+| Layout | Sidebar-first navigation, card-based content surfaces, and large visualization panels |
+| HUD Style | Real-time metrics, status chips, pulsing indicators, and compact health cards reinforce a command-center feel |
+| Responsiveness | Mobile sidebar support, collapsible navigation, and data cards that reflow into single-column stacks |
+
+### Animations and Effects
+
+| Effect | Where It Appears | Purpose |
+|---|---|---|
+| Pulse | Status dots, active items, and critical cards | Draws attention to live or urgent states |
+| Slide/fade patterns | Panels and component reveals | Makes the interface feel responsive without being noisy |
+| Force-directed animation | Network map | Conveys topology and traffic relationships visually |
+| Chart transitions | Traffic chart and score ring | Makes state changes easier to read over time |
+| Web audio alert beep | Alerts page | Provides immediate attention for critical alerts when enabled |
+
+### Styling Architecture
+
+| File | Role |
+|---|---|
+| frontend/src/design-system.ts | Central token and utility source for colors, typography, spacing, component patterns, and shortcuts |
+| frontend/src/index.css | Global visual baseline and structural styling |
+| frontend/src/components/ui/index.tsx | Shared composable primitives for badges, tooltips, and explanatory panels |
+
+### UI Strengths
+
+- Strong semantic color discipline makes it easier to distinguish risk, protocol, and status categories.
+- Beginner mode vs expert mode is a meaningful product choice, not just a cosmetic theme switch.
+- The interface supports both polling and WebSocket-driven updates, which is operationally robust.
+- The legal consent gate and zero-payload default posture show a clear defensive-use orientation.
+
+---
+
+## 🔐 Backend / Runtime Architecture
+
+### Execution Flow
+
+```text
+User Login
+   ↓
+JWT Issuance
+   ↓
+Protected Route Shell
+   ↓
+Dashboard / Capture / Scan / Alerts / Topology
+   ↓
+REST API and WebSocket Transport
+   ↓
+Service Layer (Capture, Detection, Alerting, Topology, Scanner)
+   ↓
+SQLite / Runtime State / Metrics / Audit Trail
+```
+
+### Lifecycle Flow
+
+```text
+FastAPI Startup
+   ↓
+Create database tables
+   ↓
+Instantiate alert, detection, topology, capture, websocket, and monitor services
+   ↓
+Register callbacks between services
+   ↓
+Start background monitors and retention workers
+   ↓
+Resolve gateway and populate app state
+   ↓
+Serve REST + WebSocket traffic
+   ↓
+Shutdown cleanup and stop background services
+```
+
+### Event and Async Model
+
+The backend uses event-driven callbacks heavily. Packet capture, detection, topology updates, ARP monitoring, and interface changes all emit structured events that are fanned out to the WebSocket manager or consumed by other services. This keeps the live UI synchronized without forcing the frontend to infer state from polling alone.
+
+### State Management
+
+| State Domain | Where It Lives | Notes |
+|---|---|---|
+| Authentication | Frontend localStorage + backend JWT | Rehydrated on startup, attached through Axios interceptors |
+| Capture runtime state | Backend app state + capture service object | Shared across API routes, metrics, and WebSocket broadcasts |
+| Detection and alert state | Detection engine + alert manager | In-memory operational state with DB support for related records |
+| Topology graph state | Topology service | Maintains nodes, edges, activity, and change events |
+| UI preferences | Zustand persistent store | Beginner/expert mode, sidebar state, packet display preferences, and notification toggles |
+
+### Memory and Streaming Path
+
+```text
+Packet Sniffing
+   ↓
+PacketInfo Parsing
+   ↓
+Circular Buffer + Metrics Update
+   ↓
+Detection Engine Analysis
+   ↓
+Alert Manager / Correlation Engine
+   ↓
+Topology Service Update
+   ↓
+WebSocket Broadcast
+   ↓
+Frontend State Merge
+```
+
+### Routing and Orchestration
+
+- REST routes are grouped by concern: auth, packets, scanner, alerts, dashboard, network, topology, health, and export.
+- WebSocket channels separate packets, alerts, stats, topology, and scans to reduce coupling.
+- The app state acts as a service registry so route handlers can reach the active runtime services safely.
+- The architecture is intentionally modular enough that background monitors and retention tasks can run independently of request traffic.
+
+### Networking and Capture
+
+The packet capture pipeline is metadata-first. It does not treat raw payload as the default experience; instead, it prioritizes source/destination metadata, protocols, ports, flags, and summaries. This is consistent with the defensive and privacy-aware intent of the product.
+
+### Diagram: UI to Runtime Broadcast Path
+
+```text
+Packet Capture / Scan / Detection Event
+   ↓
+Backend Service Callback
+   ↓
+WebSocket Manager Channel Broadcast
+   ↓
+React Hook Subscription
+   ↓
+Page Store or Local Component State
+   ↓
+Visualization / Alert / Chart / Map Refresh
+```
+
+### Operational Safeguards
+
+| Safeguard | Implementation |
+|---|---|
+| Local-only scanning default | Scanner validates RFC1918/private ranges by default |
+| CIDR limits | Network ranges are capped to /24-scale host counts |
+| Rate limiting | Capture/alerting/scanning logic includes throttling controls |
+| Explainability | Alerts include plain-English explanations and evidence |
+| Compliance gate | User must acknowledge legal terms before using the app |
+| Protected routes | Auth required for main app surface |
+| Error containment | Frontend error boundary prevents a blank screen failure mode |
+
+---
+
+## ⚡ Features & Capabilities
+
+### AI / Analytics Capabilities
+
+- Explainable threat detections with human-readable descriptions.
+- Correlation support for multi-step attack patterns.
+- Risk scoring and device classification for topology intelligence.
+- Security posture aggregation into a single score and health view.
+
+### Automation Systems
+
+- Automatic capture startup and graceful shutdown through lifecycle hooks.
+- Periodic polling and live stream fallback on the frontend.
+- Retention workers for cleanup and controlled storage growth.
+- Audit logging for authentication and scan lifecycle events.
+
+### Networking Capabilities
+
+- Packet capture and protocol decoding.
+- Passive host discovery.
+- Safe active network scanning with target validation.
+- ARP cache observation and spoofing indicators.
+- Default gateway detection and topology enrichment.
+
+### Monitoring Capabilities
+
+- Real-time dashboard summaries.
+- Health and readiness endpoints.
+- Internal metrics collection.
+- Packet, alert, and topology live updates.
+- Interface state tracking.
+
+### Browser / UI Integration
+
+- Protected SPA routes with auth persistence.
+- WebSocket-driven live updates.
+- Keyboard shortcut support in expert mode.
+- Live charts, score widgets, and topology canvas rendering.
+- Alert sound feedback for critical detections.
+
+### Memory / State Systems
+
+- Persistent auth state.
+- Persistent UI preference state.
+- In-memory packet buffer for recent traffic.
+- In-memory alert queue with bounded retention.
+- In-memory topology graph and recent activity windows.
+
+### Plugin / Extension-Like Surfaces
+
+- Callback registration in capture, detection, alert, and topology services.
+- Export adapters for multiple output formats.
+- Advanced detection modules that can be swapped or expanded.
+- Reusable UI primitives for future page expansion.
+
+### Realtime Systems
+
+- WebSocket channels for packets, alerts, stats, topology, and scans.
+- Live topology updates from packet events.
+- Live alert feed on dashboard and alert center.
+- Polling fallback when sockets are unavailable.
+
+---
+
+## 📊 Code Statistics
+
+| Metric | Value |
+|---|---|
+| Project files analyzed | 101 |
+| Estimated total LOC in project source/docs | 34,286 |
+| Complexity level | High |
+| Architecture rating | 9 / 10 |
+
+### High-Impact Files by Size
+
+| File | Approx. Lines | Purpose |
+|---|---:|---|
+| frontend/package-lock.json | 4,572 | Locked frontend dependency graph |
+| docs/DESIGN_SPECIFICATION.md | 2,219 | Detailed product and architecture doctrine |
+| backend/app/core/detection/rules.py | 1,187 | Advanced detection rules |
+| frontend/src/pages/NetworkScanner.tsx | 936 | Safe scan UI workflow |
+| frontend/src/pages/PacketCapture.tsx | 870 | Live packet explorer |
+| frontend/src/pages/Alerts.tsx | 845 | Alert triage and evidence review |
+| backend/app/core/scanner/network_scanner.py | 839 | Safe scan engine |
+| backend/app/core/detection/engine.py | 778 | Detection core |
+| frontend/src/pages/NetworkMap.tsx | 766 | Topology visualization |
+| backend/app/core/audit.py | 574 | Audit and event logging |
+| backend/app/core/detection/correlation.py | 553 | Correlation logic |
+| backend/app/core/topology/topology_service.py | 553 | Topology runtime state |
+| frontend/src/components/ui/index.tsx | 540 | Shared UI primitives |
+| backend/app/websocket/manager.py | 536 | WebSocket broadcast manager |
+| backend/app/core/privileged_agent.py | 505 | Privileged operation boundary |
+| docs/ARCHITECTURE_DIAGRAMS.md | 503 | ASCII system diagrams |
+| docs/DETECTION_RULES.md | 500 | Detection rule reference |
+| backend/app/core/interfaces/arp_monitor.py | 493 | ARP state monitoring |
+| frontend/src/components/Layout.tsx | 465 | Application shell |
+| docs/DETECTION_SYSTEM.md | 457 | Detection system explanation |
+
+### Statistics Interpretation
+
+The size distribution shows a balanced split between service logic, operator UI pages, and detailed documentation. The largest code modules cluster around detection, scanner safety, and live visualization, which is consistent with a monitoring platform that prioritizes runtime intelligence over simple CRUD workflows.
+
+---
+
+## 🚀 Running the Project
+
+### Backend Setup
+
+```bash
+cd backend
+python -m venv venv
+.\venv\Scripts\activate
+pip install -r requirements.txt
+python -m app.database.init_db
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+### Frontend Setup
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### Development Workflow
+
+```bash
+# Backend
+cd backend
+.\venv\Scripts\activate
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# Frontend
+cd frontend
+npm run dev
+```
+
+### Production-Oriented Commands
+
+```bash
+cd backend
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
+
+cd frontend
+npm run build
+npm run preview
+```
+
+### Windows Launchers
+
+- Use start.bat or scripts/run.bat for a Windows-friendly startup path.
+- Use stop.bat when the project provides a controlled shutdown routine.
+- Use scripts/start_project.ps1 when you need a PowerShell orchestration script.
+
+### Environment Requirements
+
+| Requirement | Why It Matters |
+|---|---|
+| Python 3.9+ | Backend runtime compatibility |
+| Node.js 18+ | Frontend build and dev server |
+| Nmap | Safe scan engine dependency |
+| Npcap / packet-capture support | Packet capture on supported systems |
+| Elevated privileges | Capture and some scan modes on certain hosts |
+
+---
+
+## 🧠 Project Identity
+
+### Design Philosophy
+
+NetMonitor is built around disciplined defensive visibility. It prefers semantic clarity, bounded behavior, and explicit consent over raw operational freedom. This is reflected in the legal banner, local-only defaults, conservative scan profiles, and explainable alerting.
+
+### System Identity
+
+This is a security operations cockpit for small-to-medium defensive use cases: home labs, SOC training, internal network monitoring, and authorized security audits. It is intentionally shaped to be both educational and operational.
+
+### Architecture Style
+
+| Style | Characteristics |
+|---|---|
+| Event-driven | Packet, alert, topology, and monitor events propagate through callbacks and WebSockets |
+| Service-oriented | Capture, detection, alerting, scanning, and topology are modular services |
+| SPA + API | React frontend consumes a FastAPI backend via REST and WebSocket channels |
+| Safety-constrained | Validation and rate limits are built into the domain logic |
+| Explainability-first | Alerts and UI elements explain what was detected and why |
+
+### Intended Use Case
+
+- Defensive network monitoring.
+- Security awareness and education.
+- Internal troubleshooting and visibility.
+- Authorized host discovery and service inspection.
+- Network topology analysis and alert triage.
+
+### Innovation Aspects
+
+- Beginner and expert modes in the same operator UX.
+- Evidence-first alert presentation rather than alarm-only display.
+- Real-time topology with activity levels and edge bandwidth cues.
+- Defensive guardrails embedded directly into scanning and capture flows.
+- Semantic design tokens that encode risk, protocol, and status meaning.
+
+---
+
+## 📌 Strengths & Improvements
+
+### Strengths
+
+- Strong separation between transport, service logic, and presentation layers.
+- Live telemetry pipeline is thoughtfully connected from packet capture to WebSocket client.
+- Safety controls are not superficial; they are implemented in validators and service logic.
+- The UI is coherent, polished, and purpose-built for operations work.
+- The project already includes comprehensive documentation and architecture notes.
+
+### Bottlenecks
+
+- Some state is kept in memory, which limits horizontal scaling without an external store.
+- Scapy and Nmap dependencies tie core features to host-level system support.
+- The checked-in virtual environment suggests repository hygiene could be improved.
+- Several views rely on repeated polling fallback paths in addition to WebSockets.
+- SQLite is appropriate for local and light deployments, but not ideal for high-concurrency production.
+
+### Scalability Notes
+
+| Area | Constraint | Implication |
+|---|---|---|
+| Packet buffer | Bounded in-memory deque | Good for safety, limited for high-throughput retention |
+| Alert storage | In-memory alert manager plus local DB | Needs external persistence for clustered deployments |
+| Topology state | In-memory graph | Would benefit from a shared cache or persistence layer in multi-node setups |
+| WebSocket fanout | Single-process manager | Needs distribution strategy for horizontal scale |
+| SQLite backend | Local file-based database | Suitable for development and small deployments, not for distributed writes |
+
+### Optimization Opportunities
+
+- Move runtime state that must survive restarts into a proper persistence or cache layer.
+- Introduce stronger schema-sharing between backend API models and frontend TypeScript interfaces.
+- Add more uniform response-shape normalization to reduce client-side defensive parsing.
+- Reduce the presence of checked-in artifacts and generated files.
+- Consider using a shared event bus if the system grows beyond a single-process deployment.
+
+### Future Improvements
+
+- Add a more explicit role-based permissions layer in the UI and backend.
+- Expand export formats and scheduled reporting.
+- Add cross-session alert correlation and searchable timelines.
+- Introduce deployment profiles for containerized or service-managed operation.
+- Add formal test coverage for the real-time event flows and safety validations.
+
+---
+
+## 🎮 User Interaction Flow
+
+### Full Journey
+
+1. The user opens the application and is presented with the legal consent banner if consent has not yet been stored.
+2. After acceptance, the user reaches the login page and submits credentials.
+3. The backend issues a JWT and the frontend stores it persistently.
+4. The sidebar shell loads with navigation, expert/beginner mode controls, and user identity.
+5. The dashboard begins fetching summary statistics and shows live posture information.
+6. The packet explorer opens, selects a capture interface, and either streams packets live or polls as fallback.
+7. The network scanner validates a target, enforces safety rules, and starts a constrained scan when allowed.
+8. Alerts accumulate in real time; the user can filter, expand evidence, acknowledge, or clear them.
+9. The topology map renders passive host and connection state, animating relationships in the graph.
+10. Settings allow the user to change their password and toggle detection rules.
+11. The user can export packets, alerts, or topology snapshots for analysis or reporting.
+12. On shutdown or navigation away, the backend stops background services cleanly and preserves the configured state.
+
+### Interaction Style Observations
+
+- The app is designed to be usable by beginners without hiding the technical details from advanced users.
+- The UI makes risk visible instead of abstracting it away.
+- Operational actions are usually paired with confirmations, safety labels, or explanatory copy.
+
+---
+
+## ✅ FINAL SUMMARY
+
+NetMonitor is a substantial defensive network monitoring platform with a clear and coherent identity. It combines packet capture, safe scanning, alerting, topology visualization, and operational telemetry into a single browser-based security console. The backend is organized as a modular, event-driven FastAPI system with strong safety and observability patterns. The frontend complements that backend with a polished SOC-style shell, live widgets, guided workflows, and a meaningful beginner/expert dual-mode experience.
+
+The project’s strongest characteristics are its explainability, its defensive posture, and its real-time architecture. The most important limitations are the reliance on local in-memory state for some runtime data, the development-oriented SQLite default, and the presence of checked-in environment artifacts. Even with those caveats, the codebase already reads like a serious technical product rather than a prototype. It is structured, documented, and intentionally designed around safe operational use.
+
+From an architectural perspective, NetMonitor is best described as a real-time, safety-constrained, event-driven network defense cockpit built with FastAPI, React, WebSockets, Scapy, and SQLite. Its current shape is strong enough for local and small-team defensive use, and it has a clear path toward more durable persistence and distributed runtime support if the project grows.
